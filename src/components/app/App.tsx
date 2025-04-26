@@ -9,30 +9,36 @@ import Loader from "../loader/Loader";
 import toast, { Toaster } from "react-hot-toast";
 import { fetchImages } from "../../fetch-api";
 import { useState, useEffect } from "react";
+import { Image } from "../../types";
 
 const App = () => {
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [images, setImages] = useState([]);
-  const [page, setPage] = useState(1);
-  const [modal, setModal] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [url, setUrl] = useState("");
-  const [alt, setAlt] = useState("");
-  const [description, setDescription] = useState("");
-  const [isEmpty, setIsEmpty] = useState("");
+  const [query, setQuery] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<unknown>(false);
+  const [images, setImages] = useState<Image[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [modal, setModal] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [url, setUrl] = useState<string>("");
+  const [alt, setAlt] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [isEmpty, setIsEmpty] = useState<boolean>(true);
+
+  interface fetchDataInterface {
+    total_pages: number;
+    results: Image[];
+  }
 
   useEffect(() => {
     if (query === "") {
       return;
     }
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       try {
         setLoading(true);
         setError(false);
         // setImages([]);
-        const data = await fetchImages(query, page);
+        const data: fetchDataInterface = await fetchImages(query, page);
         setImages((prevImages) => [...prevImages, ...data.results]);
         setIsVisible(page < data.total_pages);
         console.log(data);
@@ -46,7 +52,7 @@ const App = () => {
     fetchData();
   }, [query, page]);
 
-  const onHandleSubmit = (newQuery) => {
+  const onHandleSubmit = (newQuery: string): void => {
     setQuery(`${Date.now()}/${newQuery}`);
     setImages([]);
     setPage(1);
@@ -55,18 +61,18 @@ const App = () => {
     setIsVisible(false);
   };
 
-  const onLoadMore = () => {
+  const onLoadMore = (): void => {
     setPage((prevPage) => prevPage + 1);
   };
 
-  const openModal = (object) => {
+  const openModal = (object: Image) => {
     setModal(true);
     setUrl(object.urls.regular);
     setAlt(object.alt_description);
     setDescription(object.description);
   };
 
-  const closeModal = () => {
+  const closeModal = (): void => {
     setModal(false);
     setUrl("");
     setAlt("");
@@ -79,9 +85,7 @@ const App = () => {
       {images.length > 0 && (
         <ImageGallery images={images} openModal={openModal} />
       )}
-      {isVisible && !loading && (
-        <LoadMoreBtn onClick={onLoadMore} loading={loading} />
-      )}
+      {isVisible && !loading && <LoadMoreBtn onClick={onLoadMore} />}
       {loading && <Loader />}
       {!images.length && !isEmpty && <p>Let`s begin search...</p>}
       {error && <ErrorMessage />}

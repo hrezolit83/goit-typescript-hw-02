@@ -14,7 +14,21 @@ const customStyles = {
 
 Modal.setAppElement("#root");
 
-const ImageModal = ({ url, alt, description, modalIsOpen, closeModal }) => {
+interface ImageModalProps {
+  alt: string;
+  description: string;
+  url: string;
+  modalIsOpen: boolean;
+  closeModal: () => void;
+}
+
+const ImageModal: React.FC<ImageModalProps> = ({
+  url,
+  alt,
+  description,
+  modalIsOpen,
+  closeModal,
+}) => {
   return (
     <div>
       <Modal
@@ -23,10 +37,10 @@ const ImageModal = ({ url, alt, description, modalIsOpen, closeModal }) => {
         style={customStyles}
         contentLabel="Example Modal"
       >
-      <img src={url} alt={alt} className={css.img} />
-      <p className={css.text}>{description}</p>
+        <img src={url} alt={alt} className={css.img} />
+        <p className={css.text}>{description}</p>
       </Modal>
-    </div> 
+    </div>
   );
 };
 
